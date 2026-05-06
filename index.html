@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مُساعد</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+
+:root {
+  --gold: #f0c060;
+  --dark: #08090f;
+}
+
+body {
+  margin: 0;
+  font-family: 'Tajawal', sans-serif;
+  background: var(--dark);
+  color: white;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.left {
+  flex: 1;
+  padding: 40px;
+}
+
+h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+  background: linear-gradient(45deg, white, var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.fill {
+  height: 100%;
+  width: 33%;
+  background: var(--gold);
+  transition: width 0.4s ease;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.options input { display: none; }
+
+.options span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  transition: 0.3s;
+  text-align: center;
+  font-size: 14px;
+}
+
+.options input:checked + span {
+  background: rgba(240,192,96,0.2);
+  color: var(--gold);
+  transform: scale(1.05);
+}
+
+.btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 15px;
+}
+
+.add-btn { background: #333; color: white; }
+.whatsapp { background: var(--gold); color: #08090f; }
+
+.extra {
+  display: none;
+  margin-top: 15px;
+  background: rgba(255,255,255,0.05);
+  padding: 15px;
+  border-radius: 14px;
+}
+
+textarea {
+  width: 100%;
+  height: 80px;
+  resize: vertical;
+  border-radius: 10px;
+  border: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: rgba(255,255,255,0.08);
+  color: white;
+}
+
+input[type="date"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-family: 'Tajawal', sans-serif;
+  box-sizing: border-box;
+}
+
+/* ===== Toast إشعار النسخ ===== */
+#toast {
+  display: none;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(240,192,96,0.95);
+  color: #08090f;
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 999;
+  max-width: 320px;
+  line-height: 1.6;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+@media (max-width: 768px) {
+  .left { padding: 20px; }
+  h1 { font-size: 36px; }
+  .options { grid-template-columns: repeat(2, 1fr); }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="left">
+
+    <h1>مُساعد</h1>
+
+    <div class="progress-bar">
+      <div class="fill" id="fill"></div>
+    </div>
+
+    <div class="options">
+      <label><input type="radio" name="s" value="حلقة بحث"><span>📄 حلقة بحث</span></label>
+      <label><input type="radio" name="s" value="مشروع تخرج"><span>🎓 مشروع تخرج</span></label>
+      <label><input type="radio" name="s" value="لوغو"><span>🎨 لوغو</span></label>
+      <label><input type="radio" name="s" value="شعار"><span>✨ شعار</span></label>
+      <label><input type="radio" name="s" value="CV / سيرة ذاتية"><span>📋 CV</span></label>
+      <label><input type="radio" name="s" value="بانر / إعلان"><span>🖼️ بانر</span></label>
+      <label style="grid-column: span 2;">
+        <input type="radio" name="s" value="موقع ويب">
+        <span>🌐 موقع ويب</span>
+      </label>
+    </div>
+
+    <button class="btn add-btn" onclick="openExtra()">➕ إضافة تفاصيل</button>
+
+    <div class="extra" id="extraBox">
+      <textarea id="notes" placeholder="اكتب ملاحظاتك هون..."></textarea>
+      <input type="date" id="deliveryDate">
+      <input type="file" accept=".pdf">
+    </div>
+
+    <button class="btn whatsapp" onclick="send()">📱 إرسال عبر انستغرام</button>
+
+  </div>
+</div>
+
+<!-- إشعار النسخ -->
+<div id="toast">
+  ✅ تم نسخ الرسالة!<br>
+  الصق النص في محادثة الانستغرام 📋
+</div>
+
+<script>
+
+function openExtra() {
+  document.getElementById("extraBox").style.display = "block";
+  setProgress(2);
+}
+
+function setProgress(n) {
+  let fill = document.getElementById("fill");
+  if (n === 1) fill.style.width = "33%";
+  if (n === 2) fill.style.width = "66%";
+  if (n === 3) fill.style.width = "100%";
+}
+
+function send() {
+  let choice = document.querySelector('input[name="s"]:checked');
+  let notes  = document.getElementById("notes").value;
+  let date   = document.getElementById("deliveryDate").value;
+
+  if (!choice) {
+    alert("اختر خدمة أولاً");
+    return;
+  }
+
+  setProgress(3);
+
+  let msg = "📌 الطلب: " + choice.value + "\n";
+  msg += "📅 التسليم: " + (date || "غير محدد") + "\n";
+  msg += "📝 ملاحظات: " + (notes.trim() || "لا يوجد");
+
+  // نسخ الرسالة للكليبورد
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(msg).then(showToast).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
+
+  function fallbackCopy() {
+    let ta = document.createElement("textarea");
+    ta.value = msg;
+    ta.style.position = "fixed";
+    ta.style.opacity  = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand("copy"); } catch(e) {}
+    document.body.removeChild(ta);
+    showToast();
+  }
+
+  // فتح انستغرام بعد 900ms عشان يشوف المستخدم الإشعار
+  setTimeout(() => {
+    window.open("https://www.instagram.com/sh_80.sy/", "_blank");
+  }, 900);
+}
+
+function showToast() {
+  let t = document.getElementById("toast");
+  t.style.display = "block";
+  setTimeout(() => t.style.opacity = "1", 10);
+  setTimeout(() => {
+    t.style.opacity = "0";
+    setTimeout(() => t.style.display = "none", 400);
+  }, 3800);
+}
+
+</script>
+
+<footer style="text-align:center; padding: 20px; color: rgba(255,255,255,0.3); font-size: 13px;">
+  <em>Shahed</em> · © 2026 sh_80.sy · جميع الحقوق محفوظة
+</footer>
+
+</body>
+</html>
